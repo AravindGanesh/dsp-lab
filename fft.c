@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-double PI = 3.14159;
+double PI = 3.141592653589793;
 
 // Reference: Intro to Algorithms by CLRS
 double complex *recursive_FFT(double complex *x, int N){
