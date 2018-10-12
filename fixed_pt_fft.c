@@ -6,7 +6,7 @@
 
 double PI = 3.141592653589793;
 
-int16_t FIX = (1<<8);
+int16_t FIX = (1<<7);
 
 struct int_complex{
 	int16_t re, im;
@@ -20,7 +20,7 @@ struct int_complex *fixed_recursive_FFT(struct int_complex *x, int N){
 	// double complex wn = cexp(2*PI*I/N);
 	struct int_complex w, wn;
 	w.re = 1*FIX; w.im = 0;
-	wn.re = (int16_t)(cos(2*PI/N)*FIX); 
+	wn.re = (int16_t)(cos(-2*PI/N)*FIX); 
 	wn.im = (int16_t)(sin(-2*PI/N)*FIX); 
 
 	// double complex *X = (double complex*)malloc(N*sizeof(double complex));
@@ -37,14 +37,14 @@ struct int_complex *fixed_recursive_FFT(struct int_complex *x, int N){
 	// recursive function call
 	x_even = fixed_recursive_FFT(x_even, N/2); 
 	x_odd = fixed_recursive_FFT(x_odd, N/2); 
-	int16_t wr, wi, k;
+	int16_t wr, wi; int k;
 	for(k=0; k<(N/2); k++){
 		// X[k] = x_even[k] + w*x_odd[k];
-		X[k].re = x_even[k].re + ((w.re)*(x_even[k].re))/FIX - ((w.im)*(x_even[k].im))/FIX;
-		X[k].im = x_even[k].im + ((w.re)*(x_even[k].im))/FIX + ((w.im)*(x_even[k].re))/FIX;
+		X[k].re = x_even[k].re + (((w.re)*(x_odd[k].re))/FIX) - (((w.im)*(x_odd[k].im))/FIX);
+		X[k].im = x_even[k].im + (((w.re)*(x_odd[k].im))/FIX) + (((w.im)*(x_odd[k].re))/FIX);
 		// X[k + (N/2)] = x_even[k] - w*x_odd[k];
-		X[k+(N/2)].re = x_even[k].re + ((w.re)*(x_even[k].re))/FIX - ((w.im)*(x_even[k].im))/FIX;
-		X[k+(N/2)].im = x_even[k].im + ((w.re)*(x_even[k].im))/FIX + ((w.im)*(x_even[k].re))/FIX;
+		X[k+(N/2)].re = x_even[k].re - (((w.re)*(x_odd[k].re))/FIX) + (((w.im)*(x_odd[k].im))/FIX);
+		X[k+(N/2)].im = x_even[k].im - (((w.re)*(x_odd[k].im))/FIX) - (((w.im)*(x_odd[k].re))/FIX);
 		// w = w*wn;
 		wr = (w.re*wn.re)/FIX - (w.im*wn.im)/FIX;
 		wi = (w.re*wn.im)/FIX + (w.im*wn.re)/FIX;
@@ -92,8 +92,8 @@ int main(){
 
 	struct int_complex x_fp[N];
 	for(i=0; i<N; i++){
-		x_fp[i].re = (int16_t)(creal(x[i]) * FIX);
-		x_fp[i].im = (int16_t)(cimag(x[i]) * FIX);
+		x_fp[i].re = (int16_t)(creal(x[i])*FIX);
+		x_fp[i].im = (int16_t)(cimag(x[i])*FIX);
 	}
 
 	struct int_complex *X = fixed_recursive_FFT(x_fp, N);

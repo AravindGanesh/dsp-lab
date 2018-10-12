@@ -72,7 +72,6 @@ int main(){
 
 	double complex *X = recursive_FFT(x, N);
 
-	printf("Floating point Result\n");
 	for(i=0; i<N; i++) printf("%lf%+lfI\n", creal(X[i]), cimag(X[i]));
 
 	return 0;
